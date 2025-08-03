@@ -25,7 +25,7 @@ function Business() {
               dignissimos maxime aliquam dolorum, officiis excepturi modi, rem
               unde delectus sed porro saepe odit, aspernatur ea!
             </p>
-            <CustomButton style={"mt-10"}>Get Started</CustomButton>
+
           </div>
 
           {/* Right Section: Feature Cards */}

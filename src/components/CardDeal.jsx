@@ -9,7 +9,6 @@ function CardDeal() {
           className="flex flex-col-reverse items-center gap-10 md:flex-row-reverse paddingX"
           data-aos="fade-up"
         >
-          {/* Image Section */}
           <div
             className="flex-1"
             data-aos="zoom-in"
@@ -17,12 +16,11 @@ function CardDeal() {
           >
             <img
               src={PBimg}
-              className="w-[100%] h-[100%] rounded-3xl"
+              className="w-[100%] h-[100%] rounded-3xl hover:shadow-[0_4px_15px_#191946] transition duration-300 hover:ease-in-out hover:scale-105"
               alt="PB"
             />
           </div>
 
-          {/* Text Section */}
           <div
             className="flex flex-col items-start flex-1"
             data-aos="fade-left"
@@ -37,7 +35,7 @@ function CardDeal() {
               perspiciatis odio deleniti dolores, atque veniam hic temporibus
               vitae exercitationem? Repudiandae.
             </p>
-            <CustomButton style={"mt-10 text-white"}>Get Started</CustomButton>
+            <CustomButton style={"mt-10 bg-[#23B07C] text-white"}>Get Started</CustomButton>
           </div>
         </section>
       </div>

@@ -23,7 +23,7 @@ function CTA() {
 
             {/* Button */}
             <CustomButton
-              style={'mt-10 self-start'}
+              style={'mt-10 self-start bg-white text-[#23B37C] hover:shadow-[0_4px_15px_white]'}
               data-aos='fade-left'
               data-aos-delay='300'
             >
