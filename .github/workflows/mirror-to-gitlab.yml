@@ -19,5 +19,5 @@ jobs:
           GITLAB_URL: https://gitlab.com/newsflick/newsflixconfig.git
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          git remote add gitlab "$GITLAB_URL"
-          git push --mirror "https://oauth2:${GITLAB_TOKEN}@gitlab.com/newsflick/newsflixconfig.git"
+          git remote add gitlab $GITLAB_URL
+          git push --mirror https://oauth2:${GITLAB_TOKEN}@gitlab.com/newsflick/newsflixconfig.git
