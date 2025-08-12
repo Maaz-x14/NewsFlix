@@ -1,0 +1,21 @@
+name: Mirror to GitLab
+
+on:
+  push:
+    branches:
+      - main  # change if your default branch is different
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Mirror repo to GitLab
+        env:
+          GITLAB_URL: https://gitlab.com/newsflick/NewsFlix.git
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git remote add gitlab "$GITLAB_URL"
+          git push --mirror "https://oauth2:${GITLAB_TOKEN}@gitlab.com/newsflick/NewsFlix.git"
