@@ -1,0 +1,68 @@
+pipeline {
+    agent {
+        docker {
+            image 'node:18.20.8'
+            args '--user node'
+        }
+    }
+
+    environment {
+        BUILD_DIR = 'dist'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Maaz-x14/NewsFlix.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('Archive Build') {
+            steps {
+                archiveArtifacts artifacts: "${BUILD_DIR}/**", fingerprint: true
+            }
+        }
+
+        stage('Build Docker image') {
+            steps {
+                script {
+                    dockerImage = docker.build("newsflick:${env.BUILD_NUMBER}")
+                }
+            }
+        }
+
+        stage('Push Docker image') {
+            when {
+                expression { return env.DOCKER_REGISTRY?.trim() }
+            }
+            steps {
+                script {
+                    docker.withRegistry("${env.DOCKER_REGISTRY}", 'docker-creds') {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Build ${env.BUILD_NUMBER} completed successfully!"
+        }
+        failure {
+            echo "Build ${env.BUILD_NUMBER} failed!"
+        }
+    }
+}
