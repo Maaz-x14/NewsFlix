@@ -1,1 +1,1 @@
-Hi i am the readme and i am being used to test sync between github and gitlab
+Final testing of gitlab and github mirror sync
