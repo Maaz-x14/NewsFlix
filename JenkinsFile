@@ -1,13 +1,10 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18.20.8'
-            args '--user node'
-        }
-    }
+    agent any
 
     environment {
         BUILD_DIR = 'dist'
+        REGISTRY = 'registry.gitlab.com/newsflick/newsflixconfig'
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -17,41 +14,43 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Dependencies & Build') {
             steps {
                 sh 'npm ci'
-            }
-        }
-
-        stage('Build') {
-            steps {
                 sh 'npm run build'
             }
         }
 
-        stage('Archive Build') {
-            steps {
-                archiveArtifacts artifacts: "${BUILD_DIR}/**", fingerprint: true
-            }
-        }
-
-        stage('Build Docker image') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("newsflick:${env.BUILD_NUMBER}")
+                    dockerImage = docker.build("${REGISTRY}:${IMAGE_TAG}")
                 }
             }
         }
 
-        stage('Push Docker image') {
-            when {
-                expression { return env.DOCKER_REGISTRY?.trim() }
-            }
+        stage('Login to GitLab Registry') {
             steps {
-                script {
-                    docker.withRegistry("${env.DOCKER_REGISTRY}", 'docker-creds') {
-                        dockerImage.push()
-                    }
+                withCredentials([usernamePassword(credentialsId: 'gitlab-docker-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin registry.gitlab.com"
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh "docker push ${REGISTRY}:${IMAGE_TAG}"
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    sh '''
+                      kubectl --kubeconfig=$KUBECONFIG apply -f deployment.yaml
+                      kubectl --kubeconfig=$KUBECONFIG set image deployment/newsflickapp-deployment newsflickapp-container=${REGISTRY}:${IMAGE_TAG} --record
+                      kubectl --kubeconfig=$KUBECONFIG rollout status deployment/newsflickapp-deployment
+                    '''
                 }
             }
         }

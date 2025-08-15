@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newsflickapp-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: newsflickapp
+  template:
+    metadata:
+      labels:
+        app: newsflickapp
+    spec:
+      containers:
+      - name: newsflickapp-container
+        image: registry.gitlab.com/newsflick/newsflixconfig:latest
+        ports:
+        - containerPort: 80
