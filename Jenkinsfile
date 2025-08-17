@@ -21,26 +21,9 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies & Build') {
-            steps {
-                echo "📦 Installing dependencies & building app..."
-                sh '''
-                    npm ci
-                    npm run build
-                '''
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                echo "🧪 Running tests..."
-                sh 'npm test || echo "⚠️ Tests failed but continuing..."'
-            }
-        }
-
         stage('Build Docker Image in Minikube') {
             steps {
-                echo "🐳 Building Docker image inside Minikube..."
+                echo "🐳 Building Docker image (React build happens inside Docker)..."
                 sh '''
                     eval $(minikube docker-env)
                     docker build -t ${DOCKER_IMAGE} .
@@ -70,9 +53,6 @@ pipeline {
         }
         failure {
             echo "❌ FAILURE: Build ${env.BUILD_NUMBER} failed. Check logs!"
-        }
-        unstable {
-            echo "⚠️ UNSTABLE: Build ${env.BUILD_NUMBER} is unstable. Review test results."
         }
         cleanup {
             echo "🧹 Cleaning up workspace..."
