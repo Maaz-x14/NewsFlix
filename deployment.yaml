@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
       - name: newsflickapp-container
-        image: newsflickapp:latest   # use your local image
-        imagePullPolicy: IfNotPresent  # so it doesn’t try to pull from Docker Hub
+        image: registry.gitlab.com/newsflick/newsflixconfig:latest
+        imagePullPolicy: Always
         ports:
-          - containerPort: 80
-
+        - containerPort: 80
