@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18' 
-            args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.kube:/root/.kube'
-        }
-    }
+    agent any   // run on Jenkins host
 
     environment {
         REGISTRY   = 'registry.gitlab.com/newsflick/newsflixconfig'
@@ -28,9 +23,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${REGISTRY}:${IMAGE_TAG} ."
-                }
+                sh "docker build -t ${REGISTRY}:${IMAGE_TAG} ."
             }
         }
 
