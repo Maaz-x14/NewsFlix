@@ -13,8 +13,8 @@ spec:
         app: newsflickapp
     spec:
       containers:
-      - name: newsflickapp-container
-        image: registry.gitlab.com/newsflick/newsflixconfig:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
+        - name: newsflickapp-container
+          image: newsflick:latest # 👈 must exactly match what you built
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
