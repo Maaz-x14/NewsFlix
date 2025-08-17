@@ -1,15 +1,15 @@
 pipeline {
     agent {
         docker {
-            image 'node:18'   // or node:20 if you prefer
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // so Docker still works inside
+            image 'node:18' 
+            args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.kube:/root/.kube'
         }
     }
 
     environment {
-        BUILD_DIR = 'dist'
-        REGISTRY = 'registry.gitlab.com/newsflick/newsflixconfig'
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
+        REGISTRY   = 'registry.gitlab.com/newsflick/newsflixconfig'
+        IMAGE_TAG  = "${env.BUILD_NUMBER}"
+        APP_NAME   = "newsflickapp"
     }
 
     stages {
@@ -29,7 +29,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${REGISTRY}:${IMAGE_TAG}")
+                    sh "docker build -t ${REGISTRY}:${IMAGE_TAG} ."
                 }
             }
         }
@@ -52,9 +52,9 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh '''
-                      kubectl --kubeconfig=$KUBECONFIG apply -f deployment.yaml
-                      kubectl --kubeconfig=$KUBECONFIG set image deployment/newsflickapp-deployment newsflickapp-container=${REGISTRY}:${IMAGE_TAG} --record
-                      kubectl --kubeconfig=$KUBECONFIG rollout status deployment/newsflickapp-deployment
+                        kubectl --kubeconfig=$KUBECONFIG apply -f deployment.yaml
+                        kubectl --kubeconfig=$KUBECONFIG set image deployment/newsflickapp-deployment newsflickapp-container=${REGISTRY}:${IMAGE_TAG} --record
+                        kubectl --kubeconfig=$KUBECONFIG rollout status deployment/newsflickapp-deployment
                     '''
                 }
             }
@@ -63,10 +63,10 @@ pipeline {
 
     post {
         success {
-            echo "Build ${env.BUILD_NUMBER} completed successfully!"
+            echo "✅ Build ${env.BUILD_NUMBER} completed successfully and deployed!"
         }
         failure {
-            echo "Build ${env.BUILD_NUMBER} failed!"
+            echo "❌ Build ${env.BUILD_NUMBER} failed. Check logs."
         }
     }
 }
