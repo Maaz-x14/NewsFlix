@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     options {
-        ansiColor('xterm')       // colored logs
         timestamps()             // add timestamps to logs
         disableConcurrentBuilds()// prevent parallel builds on same job
         buildDiscarder(logRotator(numToKeepStr: '10')) // keep last 10 builds only
