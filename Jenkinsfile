@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'docker-minikube-node' } // agent with Docker & Minikube
 
     options {
         timestamps()
